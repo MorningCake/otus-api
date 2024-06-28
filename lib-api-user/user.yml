@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: 'ms-user'
+  description: Пользователи системы
+  version: 1.0.0
+
+servers:
+  - url: http://{url}/api/user/
+    variables:
+      url:
+        default: localhost:11555  # AGW
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Public API
+    description: Публичное API
+  - name: System API
+    description: Системное API
+
+paths:
+  /user/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        description: id пользователя
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Public API
+      operationId: getUserById
+      summary: Получение пользователя по id
+      responses:
+        '200':
+          description: Пользователь
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserResponse:
+      type: object
+      description: Пользователь
+      required:
+        - first_name
+        - second_name
+        - birthdate
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID
+        first_name:
+          type: string
+          description: Имя
+        second_name:
+          type: string
+          description: Фамилия
+        birthdate:
+          type: string
+          format: 'date'
+          description: Дата рождения
+        biography:
+          type: string
+          description: Хобби, интересы и т.п.
+        city:
+          type: string
+          description: Москва

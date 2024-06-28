@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: 'base Objects'
+  description: Базовые объекты системы
+  version: 1.0.0
+paths: {}
+
+components:
+  schemas:
+    BaseResponse:
+      type: object
+      description: Базовый класс для всех ответов
+      properties:
+        reason:
+          type: string
+          description: Причина возникновения ошибки
+          example: DUPLICATE
+        code:
+          type: string
+          description: Код операции от сервера
+          default: HL-0000
+          example: HL-0001
+        errorUserMessage:
+          type: string
+          description: Сообщение об ошибке для отображения пользователю
+        stackTrace:
+          type: string
+          description: StackTrace ошибки от сервера
+        totalCount:
+          type: integer
+          format: int64
+          description: Кол-во элементов, используется в списковых запросах
+        success:
+          type: boolean
+          default: true
+          description: true - запрос успешно обработан сервером
+
+    UuidResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+    LongIdResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+
+    BooleanResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      type: object
+      properties:
+        data:
+          type: boolean
+
+    AffectedResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      type: object
+      required:
+        - affected
+      properties:
+        affected:
+          type: integer
+          format: int64
+          description: Количество затронутых записей
+
+    ListSetting:
+      type: object
+      description: Параметры получения списка объектов
+      required:
+        - filters
+      properties:
+        page:
+          type: integer
+          format: int32
+          default: 1
+          description: Текущая страница
+        limit:
+          type: integer
+          format: int32
+          default: 10
+          description: Кол-во элементов на странице
+        search:
+          type: string
+          description: Параметры поиска в таблице
+        sort:
+          $ref: '#/components/schemas/Sort'
+        multisort:
+          type: array
+          description: Сортировка по нескольким полям. При ее наличии значение в поле sort игнорируется
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Sort'
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+
+    Filter:
+      type: object
+      description: Фильтр
+      required:
+        - attribute
+        - operation
+      properties:
+        attribute:
+          type: string
+        valueOne:
+          type: object
+        valueSecond:
+          type: object
+        operation:
+          $ref: '#/components/schemas/FilterOperation'
+        innerFilters:
+          type: array
+          description: Список фильтров, связанных логически OR или AND
+          items:
+            $ref: '#/components/schemas/Filter'
+    Sort:
+      type: object
+      description: Данные для сортировки
+      required:
+        - attribute
+        - order
+      properties:
+        attribute:
+          type: string
+        order:
+          $ref: '#/components/schemas/SortOrder'
+
+    SortOrder:
+      type: string
+      enum:
+        - ASC
+        - DESC
+
+    FilterOperation:
+      type: string
+      enum:
+        - EQ
+        - NE
+        - LT
+        - GT
+        - LTE
+        - GTE
+        - BETWEEN
+        - LIKE
+        - LIKE_IGNORE_CASE
+        - IN
+        - NOT_IN
+        - LIKE_END
+        - LIKE_END_IGNORE_CASE
+        - LIKE_START
+        - LIKE_START_IGNORE_CASE
+        - NOT_NULL
+        - IS_NULL
+        - OR
+        - AND
+        - NOT_LIKE
+        - NOT_LIKE_IGNORE_CASE
+        - LIST_IS_EMPTY
+        - LIST_IS_NOT_EMPTY
+
+    Role:
+      type: string
+      enum:
+        - USER
+
+  responses:
+    400Error:
+      description: Ошибка данных
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BaseResponse'
+    404Error:
+      description: Сущность не найдена
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BaseResponse'
+    500Error:
+      description: Ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BaseResponse'

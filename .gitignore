@@ -1,0 +1,61 @@
+HELP.md
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea/*
+# exclude
+!.idea/runConfigurations/
+
+*.iws
+# Compiled Python bytecode
+*.py[cod]
+
+# Log files
+*.log
+
+# Package files
+*.jar
+
+# Gradle
+build
+*.gradle
+*.build
+
+### IntelliJ IDEA ###
+*.iws
+*.iml
+*.ipr
+/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+/femida-lib-api-registry/proto/base.proto
+/femida-lib-api-audit/proto/base.proto
+/femida-lib-api-comments/proto/base.proto
+/femida-lib-api-material/proto/base.proto
+/femida-lib-api-report/proto/base.proto
+/femida-lib-api-scc/proto/base.proto
+/gen/**
+/gen

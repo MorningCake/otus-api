@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: 'login'
+  description: Логин и регистрация
+  version: 1.0.0
+
+servers:
+  - url: http://{url}/api/
+    variables:
+      url:
+        default: localhost:11555  # AGW
+
+tags:
+  - name: Public API
+    description: Публичное API
+  - name: System API
+    description: Системное API
+
+paths:
+  /login:
+    post:
+      tags:
+        - Public API
+      operationId: login
+      summary: Аутентификация
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: Токен получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '../lib-api-base/base.yml#/components/responses/400Error'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+
+  /registration:
+    post:
+      tags:
+        - Public API
+      operationId: registration
+      summary: Регистрация
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '200':
+          description: Пользователь зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '../lib-api-base/base.yml#/components/schemas/UuidResponse'
+        '400':
+          $ref: '../lib-api-base/base.yml#/components/responses/400Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+
+components:
+  schemas:
+    UserLoginRequest:
+      type: object
+      description: Пользователь
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Логин
+        password:
+          type: string
+          description: Пароль
+
+    TokenResponse:
+      type: object
+      description: Токен
+      required:
+        - token
+      properties:
+        password:
+          type: string
+          description: Токен
+
+    UserRegistrationRequest:
+      type: object
+      description: Запрос на регистрацию пользователя
+      required:
+        - first_name
+        - second_name
+        - birthdate
+        - username
+        - password
+      properties:
+        first_name:
+          type: string
+          description: Имя
+        second_name:
+          type: string
+          description: Фамилия
+        birthdate:
+          type: string
+          format: 'date'
+          description: Дата рождения
+        biography:
+          type: string
+          description: Хобби, интересы и т.п.
+        city:
+          type: string
+          description: Москва
+        username:
+          type: string
+          description: Логин
+        password:
+          type: string
+          description: Пароль
