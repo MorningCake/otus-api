@@ -1,0 +1,213 @@
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+plugins {
+    id 'java'
+    id "maven-publish"
+    id 'java-library'
+    id 'io.freefair.lombok' version '6.2.0' apply false
+    id 'org.openapi.generator' version '5.3.0'
+}
+
+group 'ru.morningcake'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+allprojects {
+    group 'ru.morningcake'
+    version '1.0.0-SNAPSHOT'
+    repositories {
+        mavenCentral()
+    }
+}
+
+
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+
+
+    ext {
+        archiveNameAndArtifactId = ''
+        PomName = ''
+        PomDescription = ''
+    }
+
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'io.freefair.lombok'
+    apply plugin: 'org.openapi.generator'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor 0, 'seconds'
+        }
+    }
+
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType(Test) {
+        systemProperty "file.encoding", "UTF-8"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java', 'build/generated/src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources', 'build/generated/src/main/resources']
+            }
+        }
+    }
+
+    afterEvaluate { Project project ->
+
+        if (project.getName().toString().endsWith("lib-api-base")) {
+            build.finalizedBy("generateBase")
+
+            task generateBase(type: GenerateTask) {
+                generatorName.set("spring")
+                inputSpec.set("$rootDir/lib-api-base/base.yml")
+                outputDir.set("$rootDir/lib-api-base/build/generated")
+                modelPackage.set("ru.morningcake.data.model.base")
+                apiPackage.set("ru.morningcake.data.controller.base")
+
+                configOptions = [
+                        dateLibrary       : "java8",
+                        interfaceOnly     : "true",
+                        gradleBuildFile   : "false",
+                        exceptionHandler  : "true",
+                        unhandledException: "true"
+                ]
+            }
+        }
+
+        def projectProperties = project.ext
+
+        if (project.hasProperty("isOpenapi") && projectProperties.isOpenapi) {
+            def files = files(file("$project.projectDir").listFiles())
+                    .filter(file -> file.name.endsWith('.yml') || file.name.endsWith('.yaml')
+                            && !file.name.endsWith('base.yml') && !file.name.endsWith('base.yaml'))
+
+            files.each {
+                def apiName = it.getName()
+                def input = "$project.projectDir/".toString() + apiName
+                def model = projectProperties.modelPackage
+                def api = projectProperties.apiPackage
+                def mappings = project.hasProperty("mappings") ? projectProperties.mappings : [:]
+
+                def baseTypeMappings = [
+                        AffectedResponse      : "ru.morningcake.data.model.base.AffectedResponse",
+                        BaseResponse          : "ru.morningcake.data.model.base.BaseResponse",
+                        BooleanResponse       : "ru.morningcake.data.model.base.BooleanResponse",
+                        Filter                : "ru.morningcake.data.model.base.Filter",
+                        FilterOperation       : "ru.morningcake.data.model.base.FilterOperation",
+                        ListSetting           : "ru.morningcake.data.model.base.ListSetting",
+                        LongIdResponse        : "ru.morningcake.data.model.base.LongIdResponse",
+                        Sort                  : "ru.morningcake.data.model.base.Sort",
+                        SortOrder             : "ru.morningcake.data.model.base.SortOrder",
+                        UuidResponse          : "ru.morningcake.data.model.base.UuidResponse",
+                        Role                  : "ru.morningcake.data.model.base.Role"
+                ]
+
+                if (apiName.endsWith(".yml")) {
+                    apiName = it.getName().replace(".yml", "")
+                } else {
+                    apiName = it.getName().replace(".yaml", "")
+                }
+
+                def taskName = "openApiGenerate" + apiName.capitalize()
+                if (!layout.projectDirectory.asFile.toString().endsWith("lib-api-base")) {
+                    build.finalizedBy(taskName)
+
+                    tasks.create(taskName, GenerateTask.class, {
+                        generatorName.set("spring")
+                        inputSpec.set(input)
+                        outputDir.set("$buildDir/generated")
+                        modelPackage.set(model)
+                        apiPackage.set(api)
+
+                        configOptions = [
+                                dateLibrary       : "java8",
+                                interfaceOnly     : "true",
+                                gradleBuildFile   : "false",
+                                exceptionHandler  : "true",
+                                unhandledException: "true"
+                        ]
+                        importMappings = baseTypeMappings + mappings
+                    })
+                }
+
+                jar {
+                    enabled = true
+                    archiveBaseName = project.archiveNameAndArtifactId
+                    archiveVersion = version
+                    if (project.tasks.findByName('generatePomFileForMavenBomPublication')) {
+                        dependsOn 'generatePomFileForMavenBomPublication'
+                        dependsOn 'build'
+                    } else {
+                        project.tasks.whenTaskAdded { addedTask ->
+                            if (addedTask.name == 'generatePomFileForMavenBomPublication') {
+                                project.tasks.jar.dependsOn 'generatePomFileForMavenBomPublication'
+                            }
+                        }
+                    }
+                    // формирование данных метаинформации в артефакте: /META-INF/maven
+                    into("META-INF/maven/$project.group/$project.archivesBaseName") {
+                        from new File(project.buildDir, 'publications/mavenBom')
+                        rename ".*", "pom.xml"
+                    }
+                }
+            }
+        }
+
+        dependencies {
+            implementation libs.bundles.openApiProjectImplementation
+            compileOnly libs.bundles.openApiProjectCompile
+
+            implementation group: "javax.annotation", name: "javax.annotation-api", version: "1.3.2"
+            implementation group: "org.jetbrains", name: "annotations", version: "13.0"
+        }
+
+        javadoc {
+            options.encoding = 'UTF-8'
+        }
+
+        task sourcesJar(type: Jar) {
+            from sourceSets.main.allJava
+            archiveClassifier.set("sources")
+        }
+
+        publishing {
+            publications {
+                maven(MavenPublication) {
+                    from components.java
+                }
+            }
+        }
+    }
+}

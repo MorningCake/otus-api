@@ -73,107 +73,18 @@ components:
           format: int64
           description: Количество затронутых записей
 
-    ListSetting:
-      type: object
-      description: Параметры получения списка объектов
-      required:
-        - filters
-      properties:
-        page:
-          type: integer
-          format: int32
-          default: 1
-          description: Текущая страница
-        limit:
-          type: integer
-          format: int32
-          default: 10
-          description: Кол-во элементов на странице
-        search:
-          type: string
-          description: Параметры поиска в таблице
-        sort:
-          $ref: '#/components/schemas/Sort'
-        multisort:
-          type: array
-          description: Сортировка по нескольким полям. При ее наличии значение в поле sort игнорируется
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Sort'
-        filters:
-          type: array
-          items:
-            $ref: '#/components/schemas/Filter'
-
-    Filter:
-      type: object
-      description: Фильтр
-      required:
-        - attribute
-        - operation
-      properties:
-        attribute:
-          type: string
-        valueOne:
-          type: object
-        valueSecond:
-          type: object
-        operation:
-          $ref: '#/components/schemas/FilterOperation'
-        innerFilters:
-          type: array
-          description: Список фильтров, связанных логически OR или AND
-          items:
-            $ref: '#/components/schemas/Filter'
-    Sort:
-      type: object
-      description: Данные для сортировки
-      required:
-        - attribute
-        - order
-      properties:
-        attribute:
-          type: string
-        order:
-          $ref: '#/components/schemas/SortOrder'
-
-    SortOrder:
+    Sex:
       type: string
+      description: Пол
       enum:
-        - ASC
-        - DESC
-
-    FilterOperation:
-      type: string
-      enum:
-        - EQ
-        - NE
-        - LT
-        - GT
-        - LTE
-        - GTE
-        - BETWEEN
-        - LIKE
-        - LIKE_IGNORE_CASE
-        - IN
-        - NOT_IN
-        - LIKE_END
-        - LIKE_END_IGNORE_CASE
-        - LIKE_START
-        - LIKE_START_IGNORE_CASE
-        - NOT_NULL
-        - IS_NULL
-        - OR
-        - AND
-        - NOT_LIKE
-        - NOT_LIKE_IGNORE_CASE
-        - LIST_IS_EMPTY
-        - LIST_IS_NOT_EMPTY
+        - MALE
+        - FEMALE
 
     Role:
       type: string
       enum:
         - USER
+        - ADMIN
 
   responses:
     400Error:

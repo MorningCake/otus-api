@@ -1,0 +1,12 @@
+dependencies {
+    api project(':lib-api-base')
+}
+
+ext {
+    archiveNameAndArtifactId = 'lib-api-user'
+    PomName = 'lib-api-user'
+    PomDescription = 'lib-api-user'
+    isOpenapi = true
+    modelPackage = "ru.morningcake.model.user"
+    apiPackage = "ru.morningcake.controller.user"
+}

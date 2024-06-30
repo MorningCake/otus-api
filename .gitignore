@@ -29,7 +29,7 @@ HELP.md
 
 # Gradle
 build
-*.gradle
+#*.gradle
 *.build
 
 ### IntelliJ IDEA ###
@@ -51,11 +51,5 @@ build/
 ### VS Code ###
 .vscode/
 
-/femida-lib-api-registry/proto/base.proto
-/femida-lib-api-audit/proto/base.proto
-/femida-lib-api-comments/proto/base.proto
-/femida-lib-api-material/proto/base.proto
-/femida-lib-api-report/proto/base.proto
-/femida-lib-api-scc/proto/base.proto
 /gen/**
 /gen

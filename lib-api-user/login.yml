@@ -32,9 +32,10 @@ paths:
         '200':
           description: Токен получен
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: '#/components/schemas/TokenResponse'
+                type: string
+                description: Токен
         '400':
           $ref: '../lib-api-base/base.yml#/components/responses/400Error'
         '404':
@@ -81,36 +82,29 @@ components:
           type: string
           description: Пароль
 
-    TokenResponse:
-      type: object
-      description: Токен
-      required:
-        - token
-      properties:
-        password:
-          type: string
-          description: Токен
-
     UserRegistrationRequest:
       type: object
       description: Запрос на регистрацию пользователя
       required:
-        - first_name
-        - second_name
+        - firstName
+        - secondName
         - birthdate
         - username
         - password
+        - sex
       properties:
-        first_name:
+        firstName:
           type: string
           description: Имя
-        second_name:
+        secondName:
           type: string
           description: Фамилия
         birthdate:
           type: string
           format: 'date'
           description: Дата рождения
+        sex:
+          $ref: "../lib-api-base/base.yml#/components/schemas/Sex"
         biography:
           type: string
           description: Хобби, интересы и т.п.

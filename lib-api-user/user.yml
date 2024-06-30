@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://{url}/api/user/
+  - url: http://{url}/api/
     variables:
       url:
         default: localhost:11555  # AGW
@@ -15,10 +15,26 @@ security:
 tags:
   - name: Public API
     description: Публичное API
-  - name: System API
-    description: Системное API
 
 paths:
+  /user/current:
+    get:
+      tags:
+        - Public API
+      operationId: getCurrentUser
+      summary: Получение своего пользователя
+      responses:
+        '200':
+          description: Пользователь
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/400Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+
   /user/{userId}:
     parameters:
       - name: userId
@@ -57,24 +73,27 @@ components:
       type: object
       description: Пользователь
       required:
-        - first_name
-        - second_name
+        - firstName
+        - secondName
         - birthdate
+        - sex
       properties:
         id:
           type: string
           format: uuid
           description: ID
-        first_name:
+        firstName:
           type: string
           description: Имя
-        second_name:
+        secondName:
           type: string
           description: Фамилия
         birthdate:
           type: string
           format: 'date'
           description: Дата рождения
+        sex:
+          $ref: "#/components/schemas/Sex"
         biography:
           type: string
           description: Хобби, интересы и т.п.

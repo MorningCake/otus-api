@@ -1,0 +1,14 @@
+pluginManagement {
+  repositories {
+      mavenCentral()
+      gradlePluginPortal()
+  }
+}
+
+enableFeaturePreview("VERSION_CATALOGS")
+
+rootProject.name = 'lib-api'
+
+include 'lib-api-base'
+include 'lib-api-user'
+

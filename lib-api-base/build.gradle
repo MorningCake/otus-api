@@ -1,0 +1,6 @@
+ext {
+    archiveNameAndArtifactId = 'lib-api-base'
+    PomName = 'lib-api-base'
+    PomDescription = 'lib-api-base'
+}
+
