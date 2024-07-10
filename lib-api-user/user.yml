@@ -93,7 +93,7 @@ components:
           format: 'date'
           description: Дата рождения
         sex:
-          $ref: "#/components/schemas/Sex"
+          $ref: "../lib-api-base/base.yml#/components/schemas/Sex"
         biography:
           type: string
           description: Хобби, интересы и т.п.
