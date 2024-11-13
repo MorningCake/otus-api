@@ -9,7 +9,7 @@ plugins {
 }
 
 group 'ru.morningcake'
-version '1.0.0-SNAPSHOT'
+version '1.1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -21,18 +21,16 @@ dependencies {
 
 allprojects {
     group 'ru.morningcake'
-    version '1.0.0-SNAPSHOT'
+    version '1.1.0-SNAPSHOT'
     repositories {
         mavenCentral()
     }
 }
 
-
 subprojects {
     repositories {
         mavenCentral()
     }
-
 
     ext {
         archiveNameAndArtifactId = ''

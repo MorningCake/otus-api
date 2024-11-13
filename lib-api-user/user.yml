@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: 'ms-user'
   description: Пользователи системы
-  version: 1.0.0
+  version: 1.1.0
 
 servers:
   - url: http://{url}/api/
@@ -60,6 +60,40 @@ paths:
           $ref: '../lib-api-base/base.yml#/components/responses/404Error'
         '500':
           $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+          
+  /user/search:
+    parameters:
+      - name: first_name
+        in: query
+        required: true
+        description: Условие поиска по имени
+        schema:
+          type: string
+          example: Ива
+      - name: last_name
+        schema:
+          type: string
+          description: Часть фамилии для поиска
+          example: Ивано
+        in: query
+        required: true
+        description: Условие поиска по фамилии
+    get:
+      tags:
+        - Public API
+      operationId: searchUserByNames
+      summary: Поиск анкет по фамилии и имени
+      responses:
+        '200':
+          description: Список анкет
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSearchResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
 
 components:
   securitySchemes:
@@ -100,3 +134,19 @@ components:
         city:
           type: string
           description: Москва
+
+    UserSearchResponse:
+      type: object
+      required:
+        - totalQnt
+        - users
+      properties:
+        totalQnt:
+          type: integer
+          format: int64
+          description: Количество найденных записей
+        users:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/UserResponse'
