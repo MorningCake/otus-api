@@ -73,6 +73,12 @@ components:
           format: int64
           description: Количество затронутых записей
 
+    LocalDate:
+      type: string
+      format: 'date'
+      description: Дата
+      x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")'
+
     Sex:
       type: string
       description: Пол

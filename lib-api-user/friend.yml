@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: 'friends'
+  description: Друзья
+  version: 1.2.0
+
+servers:
+  - url: http://{url}/api/ms-user/
+    variables:
+      url:
+        default: localhost:11555  # AGW
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Public API
+    description: Публичное API
+
+paths:
+  /friend/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        description: id пользователя
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - Public API
+      operationId: addFriendById
+      summary: Добавление пользователя в друзья по id
+      responses:
+        '200':
+          description: Пользователь добавлен в друзья
+          content:
+            application/json:
+              schema:
+                $ref: '../lib-api-base/base.yml#/components/schemas/AffectedResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+    delete:
+      tags:
+        - Public API
+      operationId: deleteFriendById
+      summary: Удаление пользователя из друзей по id
+      responses:
+        '200':
+          description: Пользователь удален из друзей
+          content:
+            application/json:
+              schema:
+                $ref: '../lib-api-base/base.yml#/components/schemas/AffectedResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+          
+  /friend:
+    parameters:
+      - name: pageSize
+        in: query
+        required: false
+        description: Размер page
+        schema:
+          default: 10
+          type: integer
+          minimum: 1
+      - name: pageNum
+        in: query
+        required: false
+        description: Номер page (начиная с 1)
+        schema:
+          default: 1
+          type: integer
+          minimum: 1
+    get:
+      tags:
+        - Public API
+      operationId: getFriends
+      summary: Получить страничку друзей для пользователя
+      responses:
+        '200':
+          description: Список друзей
+          content:
+            application/json:
+              schema:
+                $ref: './user.yml#/components/schemas/UserSearchResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

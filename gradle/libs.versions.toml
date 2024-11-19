@@ -4,17 +4,19 @@ springBootStarterVersion = "2.5.3"
 swaggerVersion = "3.0.0"
 validationApiVersion = "2.0.1.Final"
 nullableApiVersion = "0.2.1"
-jaxbAnnotations = "2.12.4"
+jaxbAnnotationsVersion = "2.12.4"
+jacksonDatatypeVersion = "2.18.1"
 
 [libraries]
 apacheCommonsLang3 = { module = "org.apache.commons:commons-lang3", version.ref = "apacheCommonsLang3Version" }
 validationApi = { module = "javax.validation:validation-api", version.ref = "validationApiVersion" }
 nullableApi = { module = "org.openapitools:jackson-databind-nullable", version.ref = "nullableApiVersion" }
-jaxbAnnotation = { module = "com.fasterxml.jackson.module:jackson-module-jaxb-annotations", version.ref = "jaxbAnnotations" }
+jaxbAnnotation = { module = "com.fasterxml.jackson.module:jackson-module-jaxb-annotations", version.ref = "jaxbAnnotationsVersion" }
+jacksonDatatype = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jacksonDatatypeVersion"}
 
 swagger = { module = "io.springfox:springfox-swagger2", version.ref = "swaggerVersion" }
 springBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBootStarterVersion" }
 
 [bundles]
-openApiProjectCompile = ["springBootStarterWeb", "validationApi", "jaxbAnnotation"]
+openApiProjectCompile = ["springBootStarterWeb", "validationApi", "jaxbAnnotation", "jacksonDatatype"]
 openApiProjectImplementation = ["swagger", "nullableApi"]

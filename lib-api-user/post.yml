@@ -1,0 +1,199 @@
+openapi: 3.0.3
+info:
+  title: 'posts'
+  description: Посты
+  version: 1.2.0
+
+servers:
+  - url: http://{url}/api/ms-user/
+    variables:
+      url:
+        default: localhost:11555  # AGW
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Public API
+    description: Публичное API
+
+paths:
+  /post:
+    post:
+      tags:
+        - Public API
+      operationId: createPost
+      summary: Создание поста текущего пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '200':
+          description: Пост создан
+          content:
+            application/json:
+              schema:
+                $ref: '../lib-api-base/base.yml#/components/schemas/UuidResponse'
+        '400':
+          $ref: '../lib-api-base/base.yml#/components/responses/400Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+
+  /post/{postId}:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        description: id поста
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Public API
+      operationId: getPostById
+      summary: Получение поста текущего пользователя
+      responses:
+        '200':
+          description: Пост получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+    put:
+      tags:
+        - Public API
+      operationId: updatePostById
+      summary: Обновление поста текущего пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '200':
+          description: Пост обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '../lib-api-base/base.yml#/components/schemas/BaseResponse'
+        '400':
+          $ref: '../lib-api-base/base.yml#/components/responses/400Error'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+    delete:
+      tags:
+        - Public API
+      operationId: deletePostById
+      summary: Удаление поста текущего пользователя
+      responses:
+        '200':
+          description: Пост удален
+          content:
+            application/json:
+              schema:
+                $ref: '../lib-api-base/base.yml#/components/schemas/AffectedResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/404Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+          
+  /post/feed:
+    parameters:
+      - name: pageSize
+        in: query
+        required: false
+        description: Размер page
+        schema:
+          default: 10
+          type: integer
+          minimum: 1
+      - name: pageNum
+        in: query
+        required: false
+        description: Номер page (начиная с 1)
+        schema:
+          default: 1
+          type: integer
+          minimum: 1
+    get:
+      tags:
+        - Public API
+      operationId: getPostsFeed
+      summary: Получить ленту постов друзей
+      responses:
+        '200':
+          description: Лента постов друзей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostFeedResponse'
+        '404':
+          $ref: '../lib-api-base/base.yml#/components/responses/400Error'
+        '500':
+          $ref: '../lib-api-base/base.yml#/components/responses/500Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PostRequest:
+      type: object
+      description: Создание/обновление поста пользователя
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: Текст поста
+
+    PostResponse:
+      type: object
+      description: Пост пользователя
+      required:
+        - id
+        - text
+        - user_id
+        - date
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID поста
+        text:
+          type: string
+          description: Текст поста
+        user_id:
+          type: string
+          format: uuid
+          description: ID пользователя
+        date:
+          type: string
+          format: 'date-time'
+          description: Время создания
+
+    PostFeedResponse:
+      type: object
+      required:
+        - posts
+        - total
+      properties:
+        total:
+          type: integer
+          description: Общее кол-во постов
+        posts:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/PostResponse'
